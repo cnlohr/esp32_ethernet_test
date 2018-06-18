@@ -129,13 +129,14 @@ void eth_task(void *pvParameter)
     inet_pton4(AF_INET, &ip.gw,       &ipInfo.gw);
     inet_pton4(AF_INET, &ip.netmask, &ipInfo.netmask);
 */
-    tcpip_adapter_init();
-    tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_ETH); // ret=0x5000 -> tcpip_adapter_invalid_params, very old esp-idf didn't implementated this yet.
 /*
     ESP_LOGI(TAG, "dhcp client stop RESULT: %d", ret);
     tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_ETH, &ipInfo);
 */
 
+
+//	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_ETH);
+	int iter = 0;
     while (1) {
 
         vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -152,6 +153,12 @@ void eth_task(void *pvParameter)
 				ESP_LOGI(TAG, "%d: %04x", j, esp_eth_smi_read(j) );
 			}
         }
+		iter++;
+		if( iter == 4 )
+		{
+	//		ESP_LOGI(TAG, "STARTING\n" );
+	 //   tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_ETH); // ret=0x5000 -> tcpip_adapter_invalid_params, very old esp-idf didn't implementated this yet.
+		}
     }
 }
 
@@ -161,14 +168,14 @@ void app_main()
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (1<<2) | (1<<25)| (1<<26)|(1<<27)|(1<<13);
+    io_conf.pin_bit_mask = (1<<2) /*| (1<<25)| (1<<26)|(1<<27)|(1<<13)*/;
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
-	gpio_set_level(13, 0); //SET PHYAD0
-	gpio_set_level(25, 1);	//SET MODE 0, 1, 2
-	gpio_set_level(27, 1);
-	gpio_set_level(26, 1);
+//	gpio_set_level(13, 0); //SET PHYAD0
+//	gpio_set_level(25, 0);	//SET MODE 0, 1, 2
+//	gpio_set_level(27, 0);
+//	gpio_set_level(26, 0);
 	gpio_set_level(2, 0);
 
     esp_err_t ret = ESP_OK;
