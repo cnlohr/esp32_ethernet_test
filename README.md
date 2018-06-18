@@ -2,7 +2,7 @@
 My Ethernet on the ESP32 Test (incomplete!)
 
 
-Note: When copying over and doing a fresh install, make sure ethernet clock is selected as GPIO16 Out
+Note: When copying over and doing a fresh install, make sure ethernet clock is selected as GPIO16 Out	
 
 ```
   │                                                                         │  
@@ -15,4 +15,6 @@ Note: When copying over and doing a fresh install, make sure ethernet clock is s
   │   Location:                                                             │  
   │     -> Example Configuration     
 ```
+
+Also, need to make sure to twiddle the RESET line and leave it high once ready.
 
