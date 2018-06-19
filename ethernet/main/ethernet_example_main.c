@@ -103,6 +103,11 @@ static void eth_gpio_config_rmii(void)
     phy_rmii_smi_configure_pins(PIN_SMI_MDC, PIN_SMI_MDIO);
 }
 
+
+
+extern int _ETH_RX;
+extern int _ETH_TX;
+
 void eth_task(void *pvParameter)
 {
     tcpip_adapter_ip_info_t ip;
@@ -152,6 +157,7 @@ void eth_task(void *pvParameter)
 			{
 				ESP_LOGI(TAG, "%d: %04x", j, esp_eth_smi_read(j) );
 			}
+			ESP_LOGI( TAG, "%d %d\n", _ETH_RX, _ETH_TX );
         }
 		iter++;
 		if( iter == 4 )
@@ -168,15 +174,17 @@ void app_main()
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (1<<2) /*| (1<<25)| (1<<26)|(1<<27)|(1<<13)*/;
+    io_conf.pin_bit_mask = (1<<2); //| (1<<25)| (1<<26)|(1<<27)|(1<<13);
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
 //	gpio_set_level(13, 0); //SET PHYAD0
-//	gpio_set_level(25, 0);	//SET MODE 0, 1, 2
-//	gpio_set_level(27, 0);
-//	gpio_set_level(26, 0);
+//	gpio_set_level(25, 1);	//SET MODE 0, 1, 2
+//	gpio_set_level(27, 1);
+//	gpio_set_level(26, 1);
 	gpio_set_level(2, 0);
+
+	ESP_LOGI( TAG, "Start up" );
 
     esp_err_t ret = ESP_OK;
     tcpip_adapter_init();
