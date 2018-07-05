@@ -16,6 +16,11 @@ config PHY_LAN8720
     help
         Select this to use the Microchip LAN8720 PHY
 
+config PHY_KSZ8081
+    bool "Micrel KSZ8081 RN/RNA PHY"
+    help
+        Select this to use the Micrel KSZ8081 PHY
+
 endchoice
 
 

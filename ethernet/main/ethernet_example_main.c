@@ -46,6 +46,10 @@
 #include "eth_phy/phy_tlk110.h"
 #define DEFAULT_ETHERNET_PHY_CONFIG phy_tlk110_default_ethernet_config
 #endif
+#ifdef CONFIG_PHY_KSZ8081
+#include "eth_phy/phy_ksz8081.h"
+#define DEFAULT_ETHERNET_PHY_CONFIG phy_ksz8081_default_ethernet_config
+#endif
 
 static const char *TAG = "eth_example";
 
@@ -153,10 +157,20 @@ void eth_task(void *pvParameter)
             ESP_LOGI(TAG, "ETHPGW:"IPSTR, IP2STR(&ip.gw));
             ESP_LOGI(TAG, "~~~~~~~~~~~");
 			int j;
-			for( j = 0; j < 16; j++ )
+#if 1
+			for( j = 0; j < 7; j++ )
 			{
 				ESP_LOGI(TAG, "%d: %04x", j, esp_eth_smi_read(j) );
 			}
+				ESP_LOGI(TAG, "%d: %04x", 17, esp_eth_smi_read(17) );
+				ESP_LOGI(TAG, "%d: %04x", 18, esp_eth_smi_read(18) );
+				ESP_LOGI(TAG, "%d: %04x", 26, esp_eth_smi_read(26) );
+				ESP_LOGI(TAG, "%d: %04x", 27, esp_eth_smi_read(27) );
+				ESP_LOGI(TAG, "%d: %04x", 30, esp_eth_smi_read(30) );
+				ESP_LOGI(TAG, "%d: %04x", 31, esp_eth_smi_read(31) );
+#else
+		    phy_ksz8081_dump_registers();
+#endif
 			ESP_LOGI( TAG, "%d %d\n", _ETH_RX, _ETH_TX );
         }
 		iter++;
@@ -174,14 +188,14 @@ void app_main()
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (1<<2); //| (1<<25)| (1<<26)|(1<<27)|(1<<13);
+    io_conf.pin_bit_mask = (1<<2)| (1<<25)| (1<<26)|(1<<27)|(1<<13);
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
-//	gpio_set_level(13, 0); //SET PHYAD0
-//	gpio_set_level(25, 1);	//SET MODE 0, 1, 2
-//	gpio_set_level(27, 1);
-//	gpio_set_level(26, 1);
+	gpio_set_level(13, 0); //SET PHYAD0 "RXER" ... or on the KSZ, 0 indicates no factory reset.
+	gpio_set_level(25, 1);	//SET MODE 0, 1, 2
+	gpio_set_level(27, 1); //SET TO 1 FOR LAN8720
+	gpio_set_level(26, 1);
 	gpio_set_level(2, 0);
 
 	ESP_LOGI( TAG, "Start up" );
@@ -192,6 +206,12 @@ void app_main()
 
 	gpio_set_level(2, 1);
 
+    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pin_bit_mask = (1<<25)| (1<<26)|(1<<27)|(1<<13);
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    gpio_config(&io_conf);
 
 
     eth_config_t config = DEFAULT_ETHERNET_PHY_CONFIG;
